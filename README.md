@@ -1,2 +1,21 @@
-# E-commerce
-Scalable RESTful E-commerce backend API built with Node.js, Express.js, and MongoDB, featuring authentication, product management, carts, orders, payments, and admin functionality.
+# E-commerce Backend API
+
+A scalable RESTful backend for a modern E-commerce platform built with **Node.js**, **Express.js**, and **MongoDB**.
+
+## Features
+
+- JWT Authentication & Authorization
+- User Profiles
+- Product Management
+- Categories
+- Wishlist
+- Shopping Cart
+- Orders
+- Payments
+- Reviews & Ratings
+- Coupons & Deals
+- Return Requests
+- Product Search & Filtering
+- Multi-language Support
+- Admin Dashboard
+- RESTful API
