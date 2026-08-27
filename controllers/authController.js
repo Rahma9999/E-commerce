@@ -19,7 +19,8 @@ exports.signup = CatchAsync(async (req, res, next) => {
         email,
         password,
         passwordConfirm,
-        phone
+        phone,
+        avatar
     } = req.body;
 
     const user = await User.create({
@@ -28,7 +29,8 @@ exports.signup = CatchAsync(async (req, res, next) => {
         email,
         password,
         passwordConfirm,
-        phone
+        phone, 
+        avatar
     });
     
     const token = signToken(user._id);
@@ -111,7 +113,7 @@ exports.forgetPassword = CatchAsync( async (req, res, next) => {
     const resetToken = user.createPasswordResetToken();
     await user.save();
 
-    const resetURL = `${req.protocol}://${req.get('host')}/users/resetPassword/${resetToken}`;
+    const resetURL = `${req.protocol}://${req.get('host')}/user/resetPassword/${resetToken}`;
 
     const message = `Forget your password? Submit a PATCH request with your new password an password Confirm to ${resetURL}.\nIf you didn't forget passowrd, please ignore this email.`;
     try{
@@ -123,15 +125,14 @@ exports.forgetPassword = CatchAsync( async (req, res, next) => {
 
         res.status(200).json({
             status: 'success',
-            message: 'Token sent to email',
-            token: resetToken
+            message: 'Token sent to email'
         });
     }catch(err){
         user.passwordResetToken = undefined;
         user.passwordResetExpire = undefined;
         await user.save();
 
-        return next(new AppError('There qas an error sending the email. Try again later!', 500));
+        return next(new AppError('There was an error sending the email. Try again later!', 500));
     }
 });
 
