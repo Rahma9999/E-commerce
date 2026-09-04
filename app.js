@@ -1,6 +1,12 @@
 const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' });
 
+process.on('uncaughtException', err => {
+    console.log('UNCAUGHT EXCEPTION 💣: Shuting down...');
+    console.log(err.name, err.message);
+    process.exit(1);
+});
+
 const express = require('express');
 const mongoose = require('mongoose');
 const AppError = require('./utils/appError');
@@ -18,7 +24,8 @@ mongoose.connect(DB)
     // console.log(con.connection);
     console.log('DB connection successful');
 })
-.catch(err => console.error(err));
+// .catch(err => console.error(err));
+
 
 const swaggerOptions = {
     swaggerDefinition: {
@@ -68,6 +75,16 @@ app.all('/{*any}', (req, res, next) => {
 app.use(globalErrorHandler);
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Server running on PORT: ${port}`);
 });
+
+//////// Important in any project to handle with unhandled rejection /////////
+process.on('unhandledRejection', err => {
+    console.log('UNHANDLED REJECTION 💣: Shuting down...');
+    console.log(err.name, err.message);
+    server.close(() => {
+        process.exit(1);
+    });
+});
+
