@@ -11,9 +11,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/ErrorController');
-const UserRouter = require('./routes/userRoute')
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
+
+const UserRouter = require('./routes/userRoute')
+const ProductRouter = require('./routes/productRoute')
 
 const app = express();
 app.use(express.json());
@@ -26,6 +28,7 @@ mongoose.connect(DB)
 })
 // .catch(err => console.error(err));
 
+app.set('query parser', 'extended');
 
 const swaggerOptions = {
     swaggerDefinition: {
@@ -63,7 +66,8 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-app.use('/user', UserRouter);
+app.use('/product', ProductRouter)
+app.use('/user', UserRouter)
 
 app.all('/{*any}', (req, res, next) => {
     next(new AppError(

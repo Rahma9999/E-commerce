@@ -1,0 +1,32 @@
+[
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c001",
+    "name": "Dresses",
+    "slug": "dresses",
+    "image": ""
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c002",
+    "name": "Outerwear",
+    "slug": "outerwear",
+    "image": ""
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c003",
+    "name": "Tops & Shirts",
+    "slug": "tops-and-shirts",
+    "image": ""
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c004",
+    "name": "Bottoms",
+    "slug": "bottoms",
+    "image": ""
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c005",
+    "name": "Knitwear",
+    "slug": "knitwear",
+    "image": ""
+  }
+]

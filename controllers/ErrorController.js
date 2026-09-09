@@ -19,9 +19,10 @@ const handleValidationErrorDB = err => {
 const handleJWTError = err => new AppError('Invalid token. Please log in again!', 401);
 const handleJWTExpiredError = err => new AppError('Your token has expired!', 401);
 
+//unexpected errors such as TypeError, ReferenceError, etc. will return HTTP 500
 const sendErrorDev = (err, res) => {
-    res.status(err.statusCode).json({
-        status: err.status,
+    res.status(err.statusCode || 500).json({
+        status: err.status || 'error',
         error: err,
         message: err.message,
         stack: err.stack
