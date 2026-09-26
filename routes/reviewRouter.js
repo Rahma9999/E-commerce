@@ -10,12 +10,12 @@ router
     .route('/')
     // /review OR /product/:productId/reviews
     .get(ReviewController.getAllReviews)
-    .post(AuthController.protect, AuthController.restrictTo('user'), ReviewController.setProductUserId, ReviewController.createReview)
-    .patch(AuthController.protect, AuthController.restrictTo('user'), ReviewController.updateReview)
+    .post(AuthController.protect, AuthController.restrictTo('user', 'admin'), ReviewController.setProductUserId, ReviewController.createReview)
+    .patch(AuthController.protect, AuthController.restrictTo('user', 'admin'), ReviewController.updateReview)
 
 router
     .route('/:id')
     .get(ReviewController.getReviewById)
-    .delete(AuthController.protect, ReviewController.deleteReview)
+    .delete(AuthController.protect, AuthController.restrictTo('user', 'admin'), ReviewController.deleteReview)
 
 module.exports = router;

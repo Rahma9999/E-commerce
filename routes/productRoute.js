@@ -6,12 +6,6 @@ const ReviewRouter = require('./reviewRouter');
 
 const router = express.Router();
 
-router.get('/getAllProducts', ProductController.getAllProducts);
-router.get('/getProduct/:id', ProductController.getProudctById);
-router.post('/addNewProduct', ProductController.addNewProduct);
-router.patch('/editProduct/:id', ProductController.updateProduct);
-router.delete('/delete/:id', ProductController.deleteProduct);
-
 router.param('id', (req, res, next, val) =>{
     console.log(`The id of product is: ${val}`);
     next();
@@ -32,7 +26,7 @@ router
 router
     .route('/:id')
     .get(ProductController.getProudctById)
-    .patch(AuthController.protect, ProductController.updateProduct)
+    .patch(AuthController.protect, AuthController.restrictTo('admin'), ProductController.updateProduct)
     .delete(AuthController.protect, AuthController.restrictTo('admin'), ProductController.deleteProduct)
 
 // Nested routes, merge params

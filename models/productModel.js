@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 
-// Don't forget change categoryId to category and import the product file again
 const productSchema = new mongoose.Schema({
-    categoryId: {
+    category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
         required: true
@@ -44,7 +43,7 @@ const productSchema = new mongoose.Schema({
 });
 
 productSchema.pre(/^find/, function(next) {
-    this.populate({ path: 'categoryId' })
+    this.populate({ path: 'category' })
 })
 
 productSchema.virtual('reviews', {

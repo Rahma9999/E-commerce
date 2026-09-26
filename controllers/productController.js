@@ -10,7 +10,7 @@ exports.checkCategory = CatchAsync(async (req, res, next) => {
     if(!check) {
         return next(new AppError('There is no category with this slug!!', 400));
     }
-    req.body.categoryId = check._id;
+    req.body.category = check._id;
     next();
 });
 
