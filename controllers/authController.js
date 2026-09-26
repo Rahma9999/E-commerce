@@ -4,7 +4,7 @@ const User = require('../models/userModel')
 const CatchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/appError')
 const sendEmail = require('../utils/email')
-const { promisfiy, promisify } = require('util')
+const { promisify } = require('util')
 
 const signToken = id => {
     return jwt.sign({ id }, process.env.JWT_SECRET , {
@@ -12,10 +12,35 @@ const signToken = id => {
     });
 }
 
+const createSendToken = (user, codeStatus, res) => {
+    const token = signToken(user._id);
+
+    const cookieOption = {
+        expires: new Date(Date.now() + process.env.JWT_COOKIES_EXPIRES_IN * 24 * 60 * 60 * 1000),
+        httpOnly: true
+    }
+    if(process.env.NODE_ENV === 'production')
+        cookieOption.secure = true;
+
+    res.cookie('jwt', token, cookieOption);
+
+    //remove the password from the output
+    user.password = undefined;
+
+    res.status(codeStatus).json({
+        status: 'success',
+        token,
+        data: {
+            user
+        }
+    });
+}
+
 exports.signup = CatchAsync(async (req, res, next) => {
     const {
         firstName,
         lastName,
+        role,
         email,
         password,
         passwordConfirm,
@@ -27,21 +52,14 @@ exports.signup = CatchAsync(async (req, res, next) => {
         firstName,
         lastName,
         email,
+        role,
         password,
         passwordConfirm,
         phone, 
         avatar
     });
     
-    const token = signToken(user._id);
-
-    res.status(201).json({
-        status: 'success',
-        token,
-        data: {
-            user
-        }
-    });
+    createSendToken(user, 201, res);
 });
 
 
@@ -56,53 +74,7 @@ exports.login = CatchAsync( async (req, res, next) => {
     if(!user || !(await user.correctPassword(password, user.password)))
         return next(new AppError('Incorrect email or password!', 401));
     
-    
-    const token = signToken(user._id);
-    res.status(200).json({
-        status: 'success',
-        token
-    });
-});
-
-exports.protect = CatchAsync( async (req, res, next) => {
-    let token
-    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
-        token = req.headers.authorization.split(' ')[1];
-
-    if(!token){
-        return next(new AppError('You are not logged in! Please log in to get access.', 401));
-    }
-
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-
-    const freshUser = await User.findById(decoded.id);
-    if(!freshUser){
-        return next(new AppError('The user belonging to this token does no longer exist'));
-    }
-
-    if(freshUser.changedPasswordAfter(decoded.iat)){
-        return next(new AppError('User recently changed password! Please log in again.', 401));
-    }
-
-    req.user = freshUser;
-
-    next();
-});
-
-exports.getAllUsers = CatchAsync( async (req, res) =>{
-    const users = await User.find();
-    
-    res.status(200).json({
-        status: 'success',
-        results: users.length,
-        data: {
-            users
-        }
-    });
-});
-
-exports.getUser = CatchAsync( async (req, res, next) => {
-
+    createSendToken(user, 200, res);
 });
 
 exports.forgetPassword = CatchAsync( async (req, res, next) => {
@@ -149,9 +121,59 @@ exports.resetPassword = CatchAsync( async (req, res, next) => {
     user.passwordResetExpire = undefined;
     await user.save();
 
-    const token = signToken(user._id);
-    res.status(200).json({
-        status: 'success',
-        token
-    });
+    createSendToken(user, 200, res);
 });
+
+/////////⚠️ Not listen to the error & not change pass
+exports.updatePassword = CatchAsync(async (req, res, next) => {
+    if(! req.body.passwordCurrent)
+        return next(new AppError('The current password is required!!', 400));
+
+    const user = await User.findById(req.user).select('+password');
+    
+    if(! await user.correctPassword(req.body.passwordCurrent, user.password))
+        return next(new AppError('You current password is wrong!',401));
+
+    if(req.body.password > 8)
+        return next(new AppError('The Password must be at least 8 characters!!', 400));
+
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.passwordConfirm;
+    user.save();
+
+    createSendToken(user, 200, res);
+});
+
+exports.protect = CatchAsync( async (req, res, next) => {
+    let token
+    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
+        token = req.headers.authorization.split(' ')[1];
+
+    if(!token){
+        return next(new AppError('You are not logged in! Please log in to get access.', 401));
+    }
+
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+    const freshUser = await User.findById(decoded.id);
+    if(!freshUser){
+        return next(new AppError('The user belonging to this token does no longer exist'));
+    }
+
+    if(freshUser.changedPasswordAfter(decoded.iat)){
+        return next(new AppError('User recently changed password! Please log in again.', 401));
+    }
+
+    req.user = freshUser;
+
+    next();
+});
+
+exports.restrictTo = (...roles) => {
+    return (req, res, next) => {
+        if(!roles.includes(req.user.role))
+            return next(new AppError('You do not have a permission to perform this action', 403));
+        next();
+    }
+
+}

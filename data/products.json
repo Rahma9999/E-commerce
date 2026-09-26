@@ -1,6 +1,6 @@
 [
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c001",
+    "category": "65f1a2b3c4d5e6f7a8b9c001",
     "name": "Floral Summer Maxi Dress",
     "description": "Lightweight breathable chiffon maxi dress with vibrant floral print and elastic waist.",
     "price": 89.99,
@@ -12,7 +12,7 @@
     "isDeal": true
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c001",
+    "category": "65f1a2b3c4d5e6f7a8b9c001",
     "name": "Classic Satin Evening Gown",
     "description": "Floor-length silk satin evening gown with a cowl neckline and side slit.",
     "price": 149.99,
@@ -24,7 +24,7 @@
     "isDeal": false
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c001",
+    "category": "65f1a2b3c4d5e6f7a8b9c001",
     "name": "Boho Printed Midi Dress",
     "description": "Bohemian style long-sleeve midi dress made from 100% viscose.",
     "price": 64.50,
@@ -36,7 +36,7 @@
     "isDeal": true
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c001",
+    "category": "65f1a2b3c4d5e6f7a8b9c001",
     "name": "Ribbed Knit Bodycon Dress",
     "description": "Form-fitting ribbed knit midi dress designed for casual and smart-casual outings.",
     "price": 55.00,
@@ -48,7 +48,7 @@
     "isDeal": false
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c001",
+    "category": "65f1a2b3c4d5e6f7a8b9c001",
     "name": "A-Line Cocktail Mini Dress",
     "description": "Chic flared mini dress crafted from structured crepe fabric with sweetheart neck.",
     "price": 79.00,
@@ -60,7 +60,7 @@
     "isDeal": true
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c002",
+    "category": "65f1a2b3c4d5e6f7a8b9c002",
     "name": "Vintage Denim Trucker Jacket",
     "description": "Classic wash denim jacket with chest button pockets and adjustable waist tabs.",
     "price": 110.00,
@@ -72,7 +72,7 @@
     "isDeal": true
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c002",
+    "category": "65f1a2b3c4d5e6f7a8b9c002",
     "name": "Faux Leather Biker Jacket",
     "description": "Asymmetrical zip motorcycle jacket made with premium soft polyurethane leather.",
     "price": 130.00,
@@ -84,7 +84,7 @@
     "isDeal": false
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c002",
+    "category": "65f1a2b3c4d5e6f7a8b9c002",
     "name": "Double-Breasted Wool Trench Coat",
     "description": "Tailored double-breasted long coat with removable belt and storm flap.",
     "price": 220.00,
@@ -96,7 +96,7 @@
     "isDeal": true
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c002",
+    "category": "65f1a2b3c4d5e6f7a8b9c002",
     "name": "Hooded Waterproof Windbreaker",
     "description": "Lightweight water-resistant shell jacket featuring cinch waist and elastic cuffs.",
     "price": 75.00,
@@ -108,7 +108,7 @@
     "isDeal": false
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c003",
+    "category": "65f1a2b3c4d5e6f7a8b9c003",
     "name": "Crisp White Cotton Oxford Shirt",
     "description": "Tailored button-down shirt woven from 100% organic long-staple cotton.",
     "price": 49.99,
@@ -120,7 +120,7 @@
     "isDeal": true
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c003",
+    "category": "65f1a2b3c4d5e6f7a8b9c003",
     "name": "Silk Satin Button-Front Blouse",
     "description": "Elegant mulberry silk-blend blouse featuring concealed buttons and French cuffs.",
     "price": 95.00,
@@ -132,7 +132,7 @@
     "isDeal": false
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c003",
+    "category": "65f1a2b3c4d5e6f7a8b9c003",
     "name": "Oversized Heavyweight Crewneck Tee",
     "description": "Boxy fit 240 GSM organic cotton t-shirt built for durable everyday wear.",
     "price": 32.00,
@@ -144,7 +144,7 @@
     "isDeal": true
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c003",
+    "category": "65f1a2b3c4d5e6f7a8b9c003",
     "name": "Linen Casual Short-Sleeve Shirt",
     "description": "Breathable pure linen shirt with cuban collar designed for warm weather.",
     "price": 58.00,
@@ -156,7 +156,7 @@
     "isDeal": false
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c004",
+    "category": "65f1a2b3c4d5e6f7a8b9c004",
     "name": "High-Waisted Straight Leg Jeans",
     "description": "100% rigid cotton denim jeans featuring high rise fit and vintage wash.",
     "price": 88.00,
@@ -168,7 +168,7 @@
     "isDeal": true
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c004",
+    "category": "65f1a2b3c4d5e6f7a8b9c004",
     "name": "Pleated Tailored Trousers",
     "description": "Wide-leg formal trousers with double pleats and side slant pockets.",
     "price": 105.00,
@@ -180,7 +180,7 @@
     "isDeal": false
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c004",
+    "category": "65f1a2b3c4d5e6f7a8b9c004",
     "name": "Relaxed Fit Fleece Joggers",
     "description": "Heavyweight cotton-blend fleece sweatpants with adjustable drawstring waistband.",
     "price": 45.00,
@@ -192,7 +192,7 @@
     "isDeal": true
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c004",
+    "category": "65f1a2b3c4d5e6f7a8b9c004",
     "name": "A-Line Denim Mini Skirt",
     "description": "Classic five-pocket denim skirt with frayed hem and stretch fabric.",
     "price": 42.00,
@@ -204,7 +204,7 @@
     "isDeal": false
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c005",
+    "category": "65f1a2b3c4d5e6f7a8b9c005",
     "name": "Chunky Cable-Knit Sweater",
     "description": "Cozy wool blend sweater with exaggerated cable texture and drop shoulders.",
     "price": 98.00,
@@ -216,7 +216,7 @@
     "isDeal": true
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c005",
+    "category": "65f1a2b3c4d5e6f7a8b9c005",
     "name": "Pure Cashmere Turtleneck",
     "description": "Ultra-soft 100% Grade-A Mongolian cashmere sweater with ribbed hem.",
     "price": 185.00,
@@ -228,7 +228,7 @@
     "isDeal": false
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c005",
+    "category": "65f1a2b3c4d5e6f7a8b9c005",
     "name": "Cropped Knit Cardigan",
     "description": "V-neck button-down cardigan sweater knit from soft cotton yarn.",
     "price": 62.00,
@@ -240,7 +240,7 @@
     "isDeal": true
   },
   {
-    "categoryId": "65f1a2b3c4d5e6f7a8b9c005",
+    "category": "65f1a2b3c4d5e6f7a8b9c005",
     "name": "Fine-Gauge Wool Crewneck",
     "description": "Lightweight Merino wool sweater suitable for layering under blazers.",
     "price": 85.00,

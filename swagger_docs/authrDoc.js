@@ -138,12 +138,12 @@
  *                 status:
  *                   type: string
  *                   example: success
- *                 message:
- *                   type: string
- *                   example: Token sent to email
  *                 token:
  *                   type: string
  *                   example: a1b2c3d4e5f6...
+ *                 message:
+ *                   type: String
+ *                   example: Token sent to email
  *       404:
  *         description: User with the provided email does not exist
  *       500:
@@ -203,4 +203,108 @@
  *         description: Invalid or expired reset token
  *       500:
  *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /user/updateMyPassword:
+ *   post:
+ *     summary: Request update password
+ *     description: take the current password, new password, and confirm password to update the user password.
+ *     tags:
+ *       - User
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - passwordCurrent
+ *               - password
+ *               - passwordConfirm
+ *             properties:
+ *               passwordCurrent:
+ *                 type: string
+ *                 format: password
+ *                 minLength: 8
+ *                 example: 123456789
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 minLength: 8
+ *                 example: 123456789
+ *               passwordConfirm:
+ *                 type: string
+ *                 format: password
+ *                 minLength: 8
+ *                 example: 123456789
+ *     responses:
+ *       200:
+ *         description: The password has been updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 token:
+ *                   type: string
+ *                   example: a1b2c3d4e5f6...
+ *       400:
+ *         description: The current password is required || The Password must be at least 8 characters
+ *       401:
+ *         description: You current password is wrong
+ *       500:
+ *         description: Server Error
+ */
+
+/**
+ * @swagger
+ * /user/updateMe:
+ *   post:
+ *     summary: Request to update the profile data
+ *     description: update firstName or lastName or phone or email.
+ *     tags:
+ *       - User
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 example: John
+ *               lastName:
+ *                 type: string
+ *                 example: Doe
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user1@gmail.com
+ *               phone:
+ *                 type: string
+ *                 example: "01234567890"
+ *     responses:
+ *       200:
+ *         description: The password has been updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 token:
+ *                   type: string
+ *                   example: a1b2c3d4e5f6...
+ *       400:
+ *         description: This route is not for password update, Please use /updateMyPassword.
+ *       500:
+ *         description: Server Error
  */

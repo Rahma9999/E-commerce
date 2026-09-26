@@ -14,11 +14,56 @@ const globalErrorHandler = require('./controllers/ErrorController');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 
+// security options
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet')
+// const mongoSantize = require('express-mongo-sanitize'); // Incompatible with Express 5.
+const mongoSantize = require('@exortek/express-mongo-sanitize');
+// const xss = require('xss-clean');
+const { xss } = require('express-xss-sanitizer')
+const hpp = require('hpp')
+
 const UserRouter = require('./routes/userRoute')
 const ProductRouter = require('./routes/productRoute')
+const ReviewRouter = require('./routes/reviewRouter')
 
 const app = express();
-app.use(express.json());
+
+// don't forget: npm i helmet field
+app.use(helmet());
+
+app.use(express.json({ limit: '10kb' }));
+
+// limit the request come from the same API
+const limiter = rateLimit({
+    max: 100,
+    windowMs: 60 * 60 * 1000,
+    message: 'Too many requests from this IP, please try again in an hour!'
+});
+
+app.use('/', limiter);
+
+// Data sanitize against NoSQL injuction
+app.use(mongoSantize());
+
+// Data sanitize aganist XSS 
+app.use(xss());
+
+// Prevent HTTP Parameter Pollution
+app.use(hpp({
+    whitelist: [
+        'price', 
+        'discountPrice', 
+        'stock', 
+        'ratingAverage', 
+        'ratingQuantity'
+    ]
+}));
+app.use((req, res, next) => {
+    console.log('AFTER SANITIZE:', req.body);
+    next();
+});
+
 const DB = process.env.DATABASE.replace('<DB_PASSWORD>', process.env.DB_PASSWORD);
 
 mongoose.connect(DB)
@@ -68,6 +113,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.use('/product', ProductRouter)
 app.use('/user', UserRouter)
+app.use('/review', ReviewRouter);
 
 app.all('/{*any}', (req, res, next) => {
     next(new AppError(

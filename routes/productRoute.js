@@ -1,15 +1,17 @@
 const express = require('express');
 const ProductController = require('../controllers/productController');
+const AuthController = require('../controllers/authController');
+// const ReviewController = require('../controllers/reviewController');
+const ReviewRouter = require('./reviewRouter');
 
 const router = express.Router();
 
-<<<<<<< Updated upstream
 router.get('/getAllProducts', ProductController.getAllProducts);
 router.get('/getProduct/:id', ProductController.getProudctById);
 router.post('/addNewProduct', ProductController.addNewProduct);
 router.patch('/editProduct/:id', ProductController.updateProduct);
 router.delete('/delete/:id', ProductController.deleteProduct);
-=======
+
 router.param('id', (req, res, next, val) =>{
     console.log(`The id of product is: ${val}`);
     next();
@@ -35,6 +37,5 @@ router
 
 // Nested routes, merge params
 router.use('/:productId/reviews', ReviewRouter);
->>>>>>> Stashed changes
 
 module.exports = router;

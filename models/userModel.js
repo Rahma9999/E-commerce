@@ -20,16 +20,12 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String, 
         required: true,
-        minlength: [8, 'Password must be at least 8 characters long'],
+        minlength: [8, 'Password must be at least 8 characters'],
         select: false
     }, 
     phone: {
         type: String, 
         required: true, 
-    }, 
-    role: {
-        type: String, 
-        default: 'customer'
     }, 
     avatar: {
         type: String,
@@ -37,15 +33,26 @@ const userSchema = new mongoose.Schema({
     passwordConfirm: {
         type: String,
         validate: {
+            //this use only with create and save!!
             validator: function(el) {
                 return el === this.password;
             },
             message: 'Passwords are not the same!'
         }
     },
+    role: {
+        type: String,
+        enum: ['guest', 'user', 'admin'],
+        default: 'user'
+    },
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpire: Date,
+    active: {
+        type: Boolean,
+        default: true,
+        select: false
+    }
 }, {
     timestamps: true
 });
@@ -74,11 +81,15 @@ userSchema.methods.createPasswordResetToken = function() {
     return resetToken;
 };
 
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function() {
     if(!this.isModified('password')) return ;
 
     this.password = await bcrypt.hash(this.password, 12);
     this.passwordConfirm = undefined;
+});
+
+userSchema.pre(/^find/, function() {
+    this.find({ active: { $ne: false }});
 })
 
 module.exports = mongoose.model('User', userSchema);
