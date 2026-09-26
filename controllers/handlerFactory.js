@@ -1,5 +1,6 @@
 const AppError = require("../utils/appError");
 const CatchAsync = require("../utils/catchAsync");
+const ApiFeature = require('../utils/apiFeature');
 
 exports.deleteOne = Model => 
     CatchAsync( async(req, res, next) => {
@@ -44,6 +45,9 @@ exports.createOne = Model =>
 
 exports.getAll = Model => 
     CatchAsync( async (req, res, next) =>{
+        // To allow for nested GET review on product {hack}
+        let filter = {}
+        if(req.params.productId) filter = {product: req.params.productId}
         const features = new ApiFeature(Model.find(), req.query)
                 .filter()
                 .sort()
@@ -59,3 +63,20 @@ exports.getAll = Model =>
             }
         });
     });
+
+exports.getOne = (Model, popOptions) => 
+    CatchAsync(async (req, res, next) => {
+        let query = Model.findById(req.params.id);
+        if(popOptions) query = query.populate(popOptions)
+
+        const doc = await query;
+        if(!doc)
+            return next(new AppError(`There is no document with this ID: ${id}`, 404));
+
+        res.status(200).json({
+            status: 'success',
+            data: {
+                doc
+            }
+        });
+});
