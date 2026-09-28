@@ -1,5 +1,5 @@
 const express = require('express');
-const CategoryController = require('../controllers/categoryController');
+const CategoryController = require('../controllers/catergoryController');
 const AuthController = require('../controllers/authController');
 
 const router = express.Router();
@@ -23,7 +23,7 @@ router
 
 router
     .route('/:id')
-    .get(CategoryController.getProudctById)
+    .get(CategoryController.getCategoryById)
     .patch(AuthController.protect, AuthController.restrictTo('admin'), CategoryController.updateCategory)
     .delete( AuthController.protect, AuthController.restrictTo('admin'), CategoryController.deleteCategory)
 

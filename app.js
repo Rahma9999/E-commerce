@@ -26,6 +26,7 @@ const hpp = require('hpp')
 const UserRouter = require('./routes/userRoute')
 const ProductRouter = require('./routes/productRoute')
 const ReviewRouter = require('./routes/reviewRouter')
+const CategoryRouter = require('./routes/categoryRoute')
 
 const app = express();
 
@@ -112,6 +113,7 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.use('/product', ProductRouter)
+app.use('/category', CategoryRouter)
 app.use('/user', UserRouter)
 app.use('/review', ReviewRouter);
 

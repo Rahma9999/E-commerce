@@ -4,7 +4,7 @@ const Category = require('../models/categoryModel');
 const ApiFeature = require("../utils/apiFeature");
 const Factory = require('./handlerFactory');
 
-exports.getProudctById = Factory.getOne(Category);
+exports.getCategoryById = Factory.getOne(Category);
 exports.getAllCategories = Factory.getAll(Category);
 exports.addNewCategory = Factory.createOne(Category);
 exports.updateCategory = Factory.updateOne(Category);
