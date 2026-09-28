@@ -128,7 +128,7 @@
  *                 status:
  *                   type: string
  *                   example: success
- *                 data:#/
+ *                 data:
  *                   type: object
  *                   properties:
  *                     doc:

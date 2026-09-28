@@ -141,7 +141,7 @@
  *                     doc:
  *                       type: object
  *       404:
- *         $ref: '#/components/responses/NotFound'
+ *         description: 'There is no document with this ID'
  *   patch:
  *     summary: Update a product
  *     description: Admin only.
