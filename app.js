@@ -27,6 +27,7 @@ const UserRouter = require('./routes/userRoute')
 const ProductRouter = require('./routes/productRoute')
 const ReviewRouter = require('./routes/reviewRouter')
 const CategoryRouter = require('./routes/categoryRoute')
+const WishlistRouter = require('./routes/wishlistRoute')
 
 const app = express();
 
@@ -115,7 +116,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/product', ProductRouter)
 app.use('/category', CategoryRouter)
 app.use('/user', UserRouter)
-app.use('/review', ReviewRouter);
+app.use('/review', ReviewRouter)
+app.use('/wishlist', WishlistRouter)
 
 app.all('/{*any}', (req, res, next) => {
     next(new AppError(

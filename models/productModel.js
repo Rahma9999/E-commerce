@@ -29,9 +29,13 @@ const productSchema = new mongoose.Schema({
     },
     ratingAverage: {
         type: Number,
+        default: 4.5,
+        max: [5.0, 'the rating must be below 5.0'],
+        min: [1.0, 'the rating must be above 1.0']
     },
     ratingQuantity: {
         type: Number,
+        default: 0
     },
     isDeal: {
         type: Boolean,
@@ -42,7 +46,7 @@ const productSchema = new mongoose.Schema({
     toObject: { virtuals: true }
 });
 
-productSchema.pre(/^find/, function(next) {
+productSchema.pre(/^find/, function() {
     this.populate({ path: 'category' })
 })
 
@@ -51,5 +55,24 @@ productSchema.virtual('reviews', {
     foreignField: 'product',
     localField: '_id'
 });
+
+productScehma.statics.decreaseStock = async function(cartItems){
+    const bulkOperations = cartItems.map(item => {
+    return {
+        updateOne: {
+            filter: { 
+                _id: item.productId, 
+                stock: { $gte: item.quantity } // Ensures stock doesn't go negative
+            }, 
+            update: { 
+                $inc: { stock: -item.quantity } 
+            }
+        }
+        };
+    });
+
+    const result = await this.bulkWrite(bulkOperations);
+    return result;
+}
 
 module.exports = mongoose.model('Product', productSchema);

@@ -52,6 +52,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
         select: false
+    },
+    wishlist: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Product',
     }
 }, {
     timestamps: true
@@ -91,5 +95,6 @@ userSchema.pre('save', async function() {
 userSchema.pre(/^find/, function() {
     this.find({ active: { $ne: false }});
 })
+
 
 module.exports = mongoose.model('User', userSchema);

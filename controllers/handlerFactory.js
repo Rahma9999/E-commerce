@@ -48,7 +48,9 @@ exports.getAll = Model =>
         // To allow for nested GET review on product {hack}
         let filter = {}
         if(req.params.productId) filter = {product: req.params.productId}
-        const features = new ApiFeature(Model.find(), req.query)
+        if(req.params.cartId) filter = {cartId: req.params.cartId}
+        
+        const features = new ApiFeature(Model.find(filter), req.query)
                 .filter()
                 .sort()
                 .limitField()

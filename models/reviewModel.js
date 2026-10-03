@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Product = require('./productModel')
 
 const reviewSchema = new mongoose.Schema({
     review: {
@@ -8,7 +9,8 @@ const reviewSchema = new mongoose.Schema({
     rating: {
         type: Number, 
         min: 1, 
-        max: 5
+        max: 5,
+        set: val => Math.round(val * 10) / 10
     }, 
     createAt: {
         type: Date,
@@ -29,7 +31,41 @@ const reviewSchema = new mongoose.Schema({
     toObject: { virtuals: true }
 });
 
-reviewSchema.pre(/^find/, function(next) {
+// Preventing duplicate reviews
+reviewSchema.index({product: 1, user: 1}, {unique: true});
+
+reviewSchema.statics.calcAverageRatings = async function (productId) {
+    const Product = mongoose.model('Product'); // avoids circular-import issues
+
+    const stats = await this.aggregate([
+        { $match: { product: new mongoose.Types.ObjectId(productId) } },
+        {
+            $group: {
+                _id: '$product',
+                nRating: { $sum: 1 },
+                avgRating: { $avg: '$rating' }
+            }
+        }
+    ]);
+
+    await Product.findByIdAndUpdate(productId, {
+        ratingAverage: stats.length ? stats[0].avgRating : 4.5,
+        ratingQuantity: stats.length ? stats[0].nRating : 0
+    });
+};
+
+// findByIdAndUpdate / findByIdAndDelete / findOneAnd*
+reviewSchema.post(/^findOneAnd/, async function (doc) {
+    if (doc) {
+        await this.model.calcAverageRatings(doc.product); 
+    }
+});
+
+reviewSchema.post('save', function() {
+    this.constructor.calcAverageRatings(this.product);
+})
+
+reviewSchema.pre(/^find/, function() {
     this.populate({
         path: 'user',
         select: 'firstName lastName avatar'
