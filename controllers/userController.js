@@ -11,6 +11,13 @@ const filterObj = (obj, ...allowedFields) => {
     return newObj;
 }
 
+exports.checkUser = (req, res, next) => {
+    if (req.body.password || req.body.passwordConfirm)
+        return next(new AppError('Use /updateMyPassword', 400));
+    req.body = filterObj(req.body, 'firstName', 'lastName', 'phone', 'email', 'role', 'active');
+    next();
+};
+
 ///////⚠️ Bug: when use user/deleteMe the record doesn't appear here//////////
 exports.getAllUsers = Factory.getAll(User);
 // we don't update password with this.
@@ -29,7 +36,11 @@ exports.updateMe = CatchAsync( async (req, res, next) => {
 
     const filteredBody = filterObj(req.body, 'firstName', 'lastName', 'phone', 'email');
     
-    const updateUser = await User.findByIdAndUpdate(req.user.id, filteredBody);
+    const updateUser = await User.findByIdAndUpdate(
+        req.user.id, 
+        filteredBody, 
+        { returnDocument: 'after', runValidators: true }
+    );
     
     res.status(200).json({
         status: 'success',

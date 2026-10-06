@@ -5,13 +5,15 @@ const User = require('../models/userModel')
 const Product = require('../models/productModel')
 
 exports.toggleWishlistItem = CatchAsync(async (req, res, next) => {
-    const { productId, quantity = 1 } = req.body;
+    const { productId } = req.body;
+    if (!productId)
+        return next(new AppError('Please provide a productId', 400));
     
     const product = await Product.findById(productId);
     if (!product)
         return next(new AppError("Product not found", 404));
 
-    const user = await User.findById(req.userId);
+    const user = await User.findById(req.user.id);
     const isAlreadyInWishlist = user.wishlist.includes(productId);
 
     let updateAction;
@@ -30,9 +32,9 @@ exports.toggleWishlistItem = CatchAsync(async (req, res, next) => {
     }
 
     const updatedUser = await User.findByIdAndUpdate(
-        req.userId,
+        req.user.id,
         updateAction,
-        { new: true }
+        { returnDocument: 'after' }
     ).select('wishlist'); 
 
     res.status(200).json({ 
@@ -46,7 +48,7 @@ exports.getWishlist = CatchAsync(async (req, res, next) => {
     const user = await User.findById(req.user.id).populate({
         path: 'wishlist',
         select: 'name price image stock'
-    });
+    }).lean();
     res.status(200).json({ 
         status: 'success',
         wishlist: user.wishlist 

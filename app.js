@@ -4,6 +4,7 @@ dotenv.config({ path: './config.env' });
 process.on('uncaughtException', err => {
     console.log('UNCAUGHT EXCEPTION 💣: Shuting down...');
     console.log(err.name, err.message);
+    console.error(err.stack);
     process.exit(1);
 });
 
@@ -22,18 +23,22 @@ const mongoSantize = require('@exortek/express-mongo-sanitize');
 // const xss = require('xss-clean');
 const { xss } = require('express-xss-sanitizer')
 const hpp = require('hpp')
+const compression = require('compression')
 
 const UserRouter = require('./routes/userRoute')
 const ProductRouter = require('./routes/productRoute')
 const ReviewRouter = require('./routes/reviewRouter')
 const CategoryRouter = require('./routes/categoryRoute')
 const WishlistRouter = require('./routes/wishlistRoute')
+const OrderRouter = require('./routes/orderRouter')
+const CartRouter = require('./routes/cartRouter')
 
 const app = express();
 
-// don't forget: npm i helmet field
+// security headers
 app.use(helmet());
-
+// It gzips JSON responses (often 70-90% smaller), which matters for big lists like products.
+app.use(compression())
 app.use(express.json({ limit: '10kb' }));
 
 // limit the request come from the same API
@@ -61,10 +66,8 @@ app.use(hpp({
         'ratingQuantity'
     ]
 }));
-app.use((req, res, next) => {
-    console.log('AFTER SANITIZE:', req.body);
-    next();
-});
+
+app.set('trust proxy', 1);
 
 const DB = process.env.DATABASE.replace('<DB_PASSWORD>', process.env.DB_PASSWORD);
 
@@ -118,6 +121,8 @@ app.use('/category', CategoryRouter)
 app.use('/user', UserRouter)
 app.use('/review', ReviewRouter)
 app.use('/wishlist', WishlistRouter)
+app.use('/order', OrderRouter)
+app.use('/cart', CartRouter)
 
 app.all('/{*any}', (req, res, next) => {
     next(new AppError(

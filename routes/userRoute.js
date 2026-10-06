@@ -21,7 +21,7 @@ router.use(AuthController.restrictTo('admin'))
 
 router
     .route('/')
-    .post(UserContoller.updateUser)
+    .post(UserContoller.checkUser, UserContoller.updateUser)
     .get(UserContoller.getAllUsers)
 
 router

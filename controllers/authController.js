@@ -40,7 +40,6 @@ exports.signup = CatchAsync(async (req, res, next) => {
     const {
         firstName,
         lastName,
-        role,
         email,
         password,
         passwordConfirm,
@@ -134,12 +133,12 @@ exports.updatePassword = CatchAsync(async (req, res, next) => {
     if(! await user.correctPassword(req.body.passwordCurrent, user.password))
         return next(new AppError('You current password is wrong!',401));
 
-    if(req.body.password > 8)
+    if (!req.body.password || req.body.password.length < 8)
         return next(new AppError('The Password must be at least 8 characters!!', 400));
 
     user.password = req.body.password;
     user.passwordConfirm = req.body.passwordConfirm;
-    user.save();
+    await user.save();
 
     createSendToken(user, 200, res);
 });

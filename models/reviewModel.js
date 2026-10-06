@@ -27,6 +27,7 @@ const reviewSchema = new mongoose.Schema({
         required: [true, 'Review must belong to user.']
     }
 }, {
+    timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
 });
@@ -61,8 +62,8 @@ reviewSchema.post(/^findOneAnd/, async function (doc) {
     }
 });
 
-reviewSchema.post('save', function() {
-    this.constructor.calcAverageRatings(this.product);
+reviewSchema.post('save', async function() {
+    await this.constructor.calcAverageRatings(this.product);
 })
 
 reviewSchema.pre(/^find/, function() {

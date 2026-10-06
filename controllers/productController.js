@@ -6,6 +6,8 @@ const ApiFeature = require("../utils/apiFeature");
 const Factory = require('./handlerFactory');
 
 exports.checkCategory = CatchAsync(async (req, res, next) => {
+    if (!req.body.categorySlug) return next();
+
     const check = await Category.findOne({slug: req.body.categorySlug});
     if(!check) {
         return next(new AppError('There is no category with this slug!!', 400));
@@ -15,7 +17,7 @@ exports.checkCategory = CatchAsync(async (req, res, next) => {
 });
 
 exports.addNewProduct = Factory.createOne(Product);
-exports.getProudctById = Factory.getOne(Product, {path: 'reviews'});
+exports.getProductById = Factory.getOne(Product, {path: 'reviews'});
 exports.updateProduct = Factory.updateOne(Product);
 exports.deleteProduct = Factory.deleteOne(Product);
 exports.getAllProducts = Factory.getAll(Product);

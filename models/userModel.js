@@ -53,10 +53,10 @@ const userSchema = new mongoose.Schema({
         default: true,
         select: false
     },
-    wishlist: {
-        type: mongoose.Schema.ObjectId,
+    wishlist: [{
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Product',
-    }
+    }]
 }, {
     timestamps: true
 });
@@ -80,8 +80,6 @@ userSchema.methods.createPasswordResetToken = function() {
     this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
     this.passwordResetExpire = Date.now() + 10 * 60 * 1000;
 
-    console.log({resetToken}, this.passwordResetToken);
-
     return resetToken;
 };
 
@@ -90,10 +88,13 @@ userSchema.pre('save', async function() {
 
     this.password = await bcrypt.hash(this.password, 12);
     this.passwordConfirm = undefined;
+    
+    // Invalidate tokens issued before the change (1s back so the new JWT stays valid)
+    if (!this.isNew) this.passwordChangedAt = Date.now() - 1000;
 });
 
 userSchema.pre(/^find/, function() {
-    this.find({ active: { $ne: false }});
+    if (!this.getOptions().includeInactive) this.find({ active: { $ne: false } });
 })
 
 

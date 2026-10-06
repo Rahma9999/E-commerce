@@ -1,7 +1,4 @@
-const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/appError");
 const Category = require('../models/categoryModel');
-const ApiFeature = require("../utils/apiFeature");
 const Factory = require('./handlerFactory');
 
 exports.getCategoryById = Factory.getOne(Category);

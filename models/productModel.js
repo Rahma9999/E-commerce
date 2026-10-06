@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const AppError = require('../utils/appError')
 
 const productSchema = new mongoose.Schema({
     category: {
@@ -10,23 +11,30 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    description: {
-        type: String
-    },
+    description: String,
     price: {
         type: Number,
-        required: true
+        required: true,
+        min: [0, 'Price cannot be negative']
     },
     discountPrice: {
-        type: Number
+        type: Number,
+        min: [0, 'Discount price cannot be negative'],
+        validate: {
+            // `this` is the document only on create/save; on updates it is the Query
+            validator: function (val) {
+                if (typeof this.price !== 'number') return true;
+                return val < this.price;
+            },
+            message: 'Discount price ({VALUE}) must be below the regular price'
+        }
     }, 
     stock: {
         type: Number,
         required: true,
+        min: [0, 'Stock cannot be negative']
     },
-    brand: {
-        type: String,
-    },
+    brand: String,
     ratingAverage: {
         type: Number,
         default: 4.5,
@@ -39,6 +47,7 @@ const productSchema = new mongoose.Schema({
     },
     isDeal: {
         type: Boolean,
+        default: false
     }
 }, {
     timestamps: true,
@@ -56,23 +65,32 @@ productSchema.virtual('reviews', {
     localField: '_id'
 });
 
-productScehma.statics.decreaseStock = async function(cartItems){
-    const bulkOperations = cartItems.map(item => {
-    return {
-        updateOne: {
-            filter: { 
-                _id: item.productId, 
-                stock: { $gte: item.quantity } // Ensures stock doesn't go negative
-            }, 
-            update: { 
-                $inc: { stock: -item.quantity } 
-            }
-        }
-        };
-    });
+//// if any item lacks stock, roll everything back through the session.
 
-    const result = await this.bulkWrite(bulkOperations);
-    return result;
-}
+productSchema.statics.decreaseStock = async function (items, session) {
+    if (!items.length) return;
+    const ops = items.map(i => ({
+    updateOne: {
+        filter: {
+            _id: i.product, 
+            stock: { $gte: i.quantity } 
+        },
+        update: { $inc: { stock: -i.quantity } },
+    },
+    }));
+    const result = await this.bulkWrite(ops, { session });
+    if (result.modifiedCount !== items.length)
+    throw new AppError('One or more products do not have enough stock', 400);
+};
+
+productSchema.statics.increaseStock = async function (items, session) {
+    const ops = items.map(i => ({
+    updateOne: { 
+        filter: { _id: i.product }, 
+        update: { $inc: { stock: i.quantity } } 
+    },
+    }));
+    return this.bulkWrite(ops, { session });
+};
 
 module.exports = mongoose.model('Product', productSchema);
