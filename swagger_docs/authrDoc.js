@@ -1,8 +1,8 @@
 /**
  * @swagger
  * tags:
- *   - name: User
- *     description: User Management API
+ *   - name: Authentication
+ *     description: Authentication, andt OTP verification.
  */
 
 /**
@@ -12,7 +12,7 @@
  *     summary: Create a new user account
  *     description: Register a new customer and return a JWT authentication token.
  *     tags:
- *       - User
+ *       - Authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -49,11 +49,13 @@
  *               phone:
  *                 type: string
  *                 example: "01234567890"
+ *               avatar:
+ *                 type: string
  *     responses:
  *       201:
- *         description: User successfully created
+ *         description: User registered and OTP email sent.
  *       400:
- *         description: Invalid input or validation error
+ *         description: Invalid input or validation error 
  *       500:
  *         description: Internal server error
  */
@@ -65,7 +67,7 @@
  *     summary: Login user
  *     description: Authenticate a user using email and password and return a JWT token.
  *     tags:
- *       - User
+ *       - Authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -99,11 +101,79 @@
  *                   type: string
  *                   example: eyJhbGciOiJIUzI1NiIs...
  *       400:
- *         description: Please provide email and password!
+ *         description: Please provide email and password! or Email not verified.
  *       401:
  *         description: Incorrect email or password!
  *       500:
  *         description: Internal server error
+ */
+
+
+/**
+ * @swagger
+ * /user/verifyOTP:
+ *   post:
+ *     summary: Verify an email using a five-digit OTP
+ *     description: The OTP expires after 10 minutes.
+ *     tags: 
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - otp
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user1@gmail.com
+ *               otp:
+ *                 type: string
+ *                 minLength: 5
+ *                 maxLength: 5
+ *                 example: 12345
+ *     responses:
+ *       200:
+ *         description: Email verified successfully
+ *       400:
+ *         description: Invalid, expired, or missing OTP
+ *       404:
+ *         description: User not found
+ */
+
+/**
+ * @swagger
+ * /user/resendOTP:
+ *   post:
+ *     summary: Request a new verification OTP
+ *     tags: [Authentication]
+ *     description: Sends a replacement OTP to the user's email.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user1@gmail.com
+ *     responses:
+ *       200:
+ *         description: New OTP sent successfully
+ *       400:
+ *         description: Missing email or invalid request
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Email delivery error
  */
 
 /**
@@ -113,7 +183,7 @@
  *     summary: Request password reset
  *     description: Send a password reset token to the user's email address.
  *     tags:
- *       - User
+ *       - Authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -157,7 +227,7 @@
  *     summary: Reset user password
  *     description: Reset the user's password using the password reset token.
  *     tags:
- *       - User
+ *       - Authentication
  *     parameters:
  *       - in: path
  *         name: token
@@ -212,7 +282,7 @@
  *     summary: Request update password
  *     description: take the current password, new password, and confirm password to update the user password.
  *     tags:
- *       - User
+ *       - Authentication
  *     requestBody:
  *       required: true
  *       content:
