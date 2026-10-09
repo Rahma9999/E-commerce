@@ -1,10 +1,13 @@
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
+const bcrypt = require('bcryptjs')
 const User = require('../models/userModel')
 const CatchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/appError')
-const sendEmail = require('../utils/email')
+// const sendEmail = require('../utils/email')
+const Email = require('../utils/email');
 const { promisify } = require('util')
+const OTP = require('../models/otpModel')
 
 const signToken = id => {
     return jwt.sign({ id }, process.env.JWT_SECRET , {
@@ -51,14 +54,13 @@ exports.signup = CatchAsync(async (req, res, next) => {
         firstName,
         lastName,
         email,
-        role,
         password,
         passwordConfirm,
         phone, 
         avatar
     });
     
-    createSendToken(user, 201, res);
+    sendOTP(user, res, next);
 });
 
 
@@ -73,37 +75,50 @@ exports.login = CatchAsync( async (req, res, next) => {
     if(!user || !(await user.correctPassword(password, user.password)))
         return next(new AppError('Incorrect email or password!', 401));
     
+    if(!user.verified)
+    return next(new AppError("Email not verified.", 403));
+
     createSendToken(user, 200, res);
 });
 
-exports.forgetPassword = CatchAsync( async (req, res, next) => {
-    const user = await User.findOne({ email : req.body.email });
-    if(!user)
-        return next(new AppError('There is no user with email address.', 404));
+
+exports.forgetPassword = CatchAsync(async (req, res, next) => {
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) {
+        return next(
+            new AppError('There is no user with this email address.', 404)
+        );
+    }
 
     const resetToken = user.createPasswordResetToken();
     await user.save();
 
-    const resetURL = `${req.protocol}://${req.get('host')}/user/resetPassword/${resetToken}`;
+    try {
+        const resetURL =
+            `${req.protocol}://${req.get('host')}` +
+            `/user/resetPassword/${resetToken}`;
 
-    const message = `Forget your password? Submit a PATCH request with your new password an password Confirm to ${resetURL}.\nIf you didn't forget passowrd, please ignore this email.`;
-    try{
-        await sendEmail({
-            email: user.email,
-            subject: 'Your password reset token (vaild for 10 min)',
-            message
-        });
+        await new Email(user, '', resetURL).sendResetPassword();
 
         res.status(200).json({
             status: 'success',
-            message: 'Token sent to email'
+            message: 'Password reset link sent to email.',
+            resetToken
         });
-    }catch(err){
+    } catch (err) {
         user.passwordResetToken = undefined;
         user.passwordResetExpire = undefined;
         await user.save();
 
-        return next(new AppError('There was an error sending the email. Try again later!', 500));
+        console.error('Password reset email error:', err);
+
+        return next(
+            new AppError(
+                'There was an error sending the email. Try again later!',
+                500
+            )
+        );
     }
 });
 
@@ -119,6 +134,7 @@ exports.resetPassword = CatchAsync( async (req, res, next) => {
     user.passwordResetToken = undefined;
     user.passwordResetExpire = undefined;
     await user.save();
+    await OTP.deleteMany({ userId: user._id });
 
     createSendToken(user, 200, res);
 });
@@ -142,6 +158,14 @@ exports.updatePassword = CatchAsync(async (req, res, next) => {
 
     createSendToken(user, 200, res);
 });
+
+exports.logout = (req, res) => {
+    res.cookie('jwt', 'loggedout', {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true
+    });
+    res.status(200).json({status: 'success'});
+}
 
 exports.protect = CatchAsync( async (req, res, next) => {
     let token
@@ -176,3 +200,71 @@ exports.restrictTo = (...roles) => {
     }
 
 }
+
+const sendOTP = CatchAsync(async (user, res, next) => {
+    const {_id} = user;
+    const otp = `${Math.floor(10000 + Math.random() * 90000)}`;
+    const hashedOTP = await bcrypt.hash(otp, 10);
+    const expireDate = Date.now() + 10 * 60 * 1000; //10 min
+
+    await OTP.create({
+        userId: _id,
+        otp: hashedOTP,
+        createdAt: Date.now(),
+        expireAt: expireDate
+    });
+
+    await new Email(user, otp).sendOTP();
+    createSendToken(user,201,res);
+});
+
+exports.verifyOTP = CatchAsync(async (req, res, next) => {
+    const {email, otp} = req.body;
+    if(!email || !otp)
+        return next(new AppError('Empty OTP details', 400));
+    
+    const user = await User.findOne({email});
+    if (!user) 
+        return next(new AppError("User not found", 404));
+    
+    const userId = user._id;
+    const userOTPRecord = await OTP.find({userId});
+
+    if(userOTPRecord.length === 0)
+        return next(new AppError("Account doesn't exist or has been verified already. Please signup or login"), 400);
+
+    const {expireAt} = userOTPRecord[0];
+
+    if(expireAt < Date.now()){
+        await OTP.deleteMany({userId});
+        return next(new AppError("OTP expired. Please request again.", 400));
+    }
+
+    const hashedOTP = userOTPRecord[0].otp;
+    const validOTP = await bcrypt.compare(otp, hashedOTP);
+    if(!validOTP){
+        return next(new AppError("Invalid OTP", 400));
+    }
+    
+    await OTP.deleteMany({userId});
+    await User.findByIdAndUpdate(userId, {verified: true});
+    res.status(200).json({
+        veriifed: true,
+        message: "Email verified successfully."
+    });
+});
+
+exports.resendOTP = CatchAsync(async (req, res, next) => {
+
+    const {email} = req.body;
+    if(!email)
+        return next(new AppError('Email is missing', 400));
+    
+    const user = await User.findOne({email});
+    if(!user)
+        return next(new AppError('User not found', 400));
+    
+    const userId = user._id;
+    await OTP.deleteMany({userId});
+    sendOTPVerification(user, res, next);
+});

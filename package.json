@@ -30,6 +30,7 @@
     "field": "^1.0.1",
     "helmet": "^8.3.0",
     "hpp": "^0.2.3",
+    "html-to-text": "^10.0.1",
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.5.0",
     "mongoose": "^9.7.4",
