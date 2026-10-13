@@ -55,8 +55,6 @@ The application uses security middleware and validation techniques to help prote
 - **Centralized error handling** — provides consistent API error responses
 - **Compression** — reduces response size using gzip or other supported compression methods
 
-> Security middleware must be configured correctly, and production deployments should use HTTPS, appropriate CORS policies, secure environment variables, and suitable rate limits.
-
 ## 🧰 Tech Stack
 
 ### Backend
@@ -215,7 +213,7 @@ http://localhost:3000/api-docs
 ```
 OR
 ```text
-'https://e-commerce-shop.up.railway.app/api-docs
+https://e-commerce-shop.up.railway.app/api-docs
 ```
 
 The documented endpoints should include:
